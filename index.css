@@ -42,12 +42,6 @@ body, html {
   gap: 32px;
 }
 
-.login-logo {
-  width: 100%;
-  max-width: 250px;
-  height: auto;
-}
-
 .login-form-wrapper {
   background-color: var(--sidebar-bg);
   padding: 40px;

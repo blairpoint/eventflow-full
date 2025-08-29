@@ -1750,21 +1750,6 @@ function App({ currentUser, onLogout, onSaveUser, initialData, onUpdateData }) {
     setActiveSubMenu('ticketing'); // Default to first event sub-item
   };
 
-  const handleSubMenuClick = (id) => {
-    // If user clicks on 'Setup', do nothing because they are already there.
-    // The 'Setup' button only appears when they are on that page.
-    if (id === 'setup') {
-      return;
-    }
-
-    // For any other sub-menu item, exit the setup view if we are in it.
-    if (eventsView === 'setup' || eventBeingSetup) {
-      setEventsView('list');
-      setEventBeingSetup(null);
-    }
-    setActiveSubMenu(id);
-  };
-
   const handleShowCreateOrg = () => {
     setIsOrgDropdownOpen(false);
     setIsCreatingOrg(true);
@@ -1852,8 +1837,6 @@ function App({ currentUser, onLogout, onSaveUser, initialData, onUpdateData }) {
     
     setEventBeingSetup(newEvent);
     setEventsView('setup');
-    setSelectedEventId(newEvent.id);
-    setActiveSubMenu('setup');
   };
   
   const handleAddArtist = (newArtistData) => {
@@ -2112,11 +2095,6 @@ function App({ currentUser, onLogout, onSaveUser, initialData, onUpdateData }) {
   
   const getEventSubNav = () => {
     let navItems = [...baseEventSubNav];
-
-    if (eventBeingSetup && eventBeingSetup.id === selectedEventId) {
-        navItems.unshift({ id: 'setup', name: 'Event Setup', icon: 'fas fa-cogs' });
-    }
-
     if (selectedEventId && eventInventory[selectedEventId] && (eventInventory[selectedEventId].artists.length > 0 || eventInventory[selectedEventId].equipment.length > 0)) {
       navItems.push({ id: 'eventory', name: 'Eventory', icon: 'fas fa-clipboard-list' });
     }
@@ -2246,7 +2224,7 @@ function App({ currentUser, onLogout, onSaveUser, initialData, onUpdateData }) {
               <ul className="sub-nav">
                 {getEventSubNav().map(subItem => (
                   <li key={subItem.id}>
-                    <button className={`nav-item sub-item ${activeSubMenu === subItem.id ? 'active' : ''}`} onClick={() => handleSubMenuClick(subItem.id)}>
+                    <button className={`nav-item sub-item ${activeSubMenu === subItem.id ? 'active' : ''}`} onClick={() => setActiveSubMenu(subItem.id)}>
                       <i className={subItem.icon} aria-hidden="true"></i>
                       <span>{subItem.name}</span>
                     </button>
@@ -2324,6 +2302,54 @@ function App({ currentUser, onLogout, onSaveUser, initialData, onUpdateData }) {
   );
 }
 
+function GradientAppleLogo() {
+    const canvasRef = useRef(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Rainbow gradient apple
+        const gradient = ctx.createLinearGradient(0, 0, 0, rect.height);
+        gradient.addColorStop(0, '#ff6b6b');      // Red
+        gradient.addColorStop(0.2, '#feca57');    // Yellow
+        gradient.addColorStop(0.4, '#48dbfb');    // Light blue
+        gradient.addColorStop(0.6, '#0abde3');    // Medium blue
+        gradient.addColorStop(0.8, '#006ba6');    // Dark blue
+        gradient.addColorStop(1, '#8e44ad');      // Purple
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY + 6, 24, 30, 0, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Stem
+        ctx.fillStyle = '#27ae60';
+        ctx.fillRect(centerX - 1, centerY - 29, 2, 8);
+        
+        // Leaf
+        ctx.fillStyle = '#2ecc71';
+        ctx.beginPath();
+        ctx.ellipse(centerX + 5, centerY - 26, 5, 3, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.fill();
+    }, []);
+
+    return <canvas ref={canvasRef} style={{ width: '50px', height: '70px' }} aria-label="Logo of a gradient-colored apple" />;
+}
+
 function LoginPage({ onLogin, onRegister }) {
   const [isRegisterView, setIsRegisterView] = useState(false);
   const [email, setEmail] = useState('');
@@ -2367,7 +2393,7 @@ function LoginPage({ onLogin, onRegister }) {
 
   return (
     <div className="login-page-container">
-      <img src="https://i.ibb.co/YB8kr4L9/eventflow.png" alt="EventFlow Logo" className="login-logo" />
+      <GradientAppleLogo />
       <div className="login-form-wrapper">
         <h2 className="login-title">{isRegisterView ? 'Create Account' : 'Log In'}</h2>
         <p className="login-subtitle">
